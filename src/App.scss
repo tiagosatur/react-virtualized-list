@@ -2,3 +2,44 @@
   max-width: 1280px;
   margin: 0 auto;
 }
+
+.App {
+  height: 500px;
+}
+
+.button {
+  background-color: $c-pink;
+  border: 4px solid $c-green;
+  border-radius: 2px;
+  color: $c-white;
+  outline: $c-green;
+  &:hover {
+    border: 4px solid $c-green;
+  }
+  &:active, &:focus {
+    border-color: $c-green;
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+
+  &__block {
+    display: flex;
+  }
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
+  
+  h1 {
+    font-size: 32px;
+  }
+}
+
+.actions {
+  justify-content: center;
+}

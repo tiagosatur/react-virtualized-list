@@ -1,0 +1,12 @@
+.inner-container {
+    background-color: $c-purple;
+    color: white;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    padding: 10px 12px;
+  
+    span {
+      display: inline-block;
+    }
+  }
