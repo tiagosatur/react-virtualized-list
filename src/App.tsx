@@ -7,7 +7,7 @@ import './App.scss';
 
 function App() {
   const [products, setProducts] = useState<Product[]>(
-    useMemo(() => generateProductList(100000), [])
+    useMemo(() => generateProductList(300000), [])
   );
 
   const onAddProduct = () => {
