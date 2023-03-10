@@ -2,12 +2,13 @@
 .list {
     background-color: $c-purple;
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     height: 100%;
     list-style: none;
+    margin: 0;
     padding: 0;
     position: relative;
-    overflow-y: scroll;
     width: 600px;
   
     .list-item {

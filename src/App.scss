@@ -3,10 +3,6 @@
   margin: 0 auto;
 }
 
-.App {
-  height: 500px;
-}
-
 .button {
   background-color: $c-pink;
   border: 4px solid $c-green;
@@ -42,4 +38,5 @@
 
 .actions {
   justify-content: center;
+  margin-bottom: 12px;
 }

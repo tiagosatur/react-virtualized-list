@@ -1,9 +1,17 @@
 import './InnerContainer.scss';
 
 interface InnerContainerProps {
-  children: JSX.Element;
+  index: number;
+  name: string;
+  price: string;
 }
 
-export const InnerContainer = ({ children }: InnerContainerProps) => {
-  return <div className='inner-container'>{children}</div>;
+export const InnerContainer = ({ index, name, price }: InnerContainerProps) => {
+  return (
+    <div className='inner-container'>
+      <span>{index}</span>
+      <span>{name}</span>
+      <span>US$ {price}</span>
+    </div>
+  );
 };

@@ -1,0 +1,13 @@
+.list-header {
+    background-color: $c-purple-dark;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 12px;
+
+    span {
+        color: $c-white;
+        display: inline-block;
+        font-size: 16px;
+        font-weight: 600;
+    }
+}

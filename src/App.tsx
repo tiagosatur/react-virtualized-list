@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { VirtualizedList } from './components/VirtualizedList/VirtualizedList';
 import { InnerContainer } from './components/InnerContainer/InnerContainer';
+import { ListHeader } from './components/ListHeader/ListHeader';
 import { generateProductList, generateProduct, Product } from './productUtils';
 import './App.scss';
 
@@ -12,6 +13,11 @@ function App() {
   const onAddProduct = () => {
     const newProduct = generateProduct(products.length + 1);
     setProducts((prevProducts) => [newProduct].concat(prevProducts));
+  };
+
+  const renderProduct = (index: number): JSX.Element => {
+    const { i, name, price, id } = products[index];
+    return <InnerContainer key={id} index={i} name={name} price={price} />;
   };
 
   return (
@@ -27,17 +33,12 @@ function App() {
         </div>
       </header>
       <VirtualizedList
-        rowHeight={60}
-        renderRow={(child) => <InnerContainer>{child}</InnerContainer>}
-      >
-        {products.map((p, i) => (
-          <React.Fragment key={`name-${i}`}>
-            <span>{p.i}</span>
-            <span>{p.name}</span>
-            <span>{p.price}</span>
-          </React.Fragment>
-        ))}
-      </VirtualizedList>
+        itemHeight={50}
+        height={500}
+        header={ListHeader}
+        totalItems={products.length}
+        renderItem={renderProduct}
+      />
     </div>
   );
 }

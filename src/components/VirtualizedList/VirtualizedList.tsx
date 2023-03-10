@@ -1,113 +1,85 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import useElementDimensions from '../../useElementDimensions';
-import { isArray, throttle } from 'lodash';
+import React, { useState, useMemo } from 'react';
 import './VirtualizedList.scss';
 
+interface MemoizedRenderItem {
+  (index: number): JSX.Element;
+}
+
+interface RenderItem {
+  (index: number): JSX.Element;
+}
+
 export interface VirtualizedListProps {
-  children: Array<JSX.Element>;
-  rowHeight: number;
-  gap?: number;
-  renderRow?: (child: JSX.Element) => JSX.Element;
-}
-
-interface ListItemProps {
-  top: number;
+  itemHeight: number;
+  totalItems: number;
+  renderItem: RenderItem;
+  header?: () => JSX.Element | null;
   height: number;
-  lineHeight: string;
-  children: JSX.Element;
+  bufferedItems?: number;
 }
 
-const ListItem = ({ top, height, lineHeight, children }: ListItemProps) => {
-  return (
-    <div
-      className='list-item'
-      style={{
-        top,
-        height,
-        lineHeight,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const DefaultRenderRow = (child: JSX.Element) => (
-  <div className='default-render-row'>{child}</div>
-);
-
-const bufferedItems = 2;
-
-export const VirtualizedList = ({
-  rowHeight,
-  children,
-  gap = 10,
-  renderRow = (child) => DefaultRenderRow(child),
-}: VirtualizedListProps) => {
-  if (!isArray(children)) {
-    throw Error('VirtualizedList expects an array of children');
-  }
-
-  if (!children.length) {
-    return null;
-  }
-
-  const [containerRef, { height: containerHeight }] =
-    useElementDimensions<HTMLUListElement>();
+export function VirtualizedList({
+  itemHeight,
+  renderItem,
+  height,
+  totalItems,
+  bufferedItems = 10,
+  header = () => null,
+}: VirtualizedListProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  useEffect(() => {
-    return () => {
-      onScroll.cancel();
-    };
-  }, []);
+  const innerHeight = totalItems * itemHeight;
 
-  const onScroll = React.useMemo(
-    () =>
-      throttle(
-        function (e: any) {
-          setScrollPosition(e.target.scrollTop);
-        },
-        60,
-        { leading: false }
-      ),
-    []
+  const startIndex = Math.max(
+    Math.floor(scrollPosition / itemHeight) - bufferedItems,
+    0
+  );
+  let endIndex = Math.min(
+    Math.ceil((scrollPosition + height) / itemHeight - 1) + bufferedItems,
+    totalItems - 1
   );
 
-  const visibleRows = useMemo(() => {
-    const startIndex = Math.max(
-      Math.floor(scrollPosition / rowHeight) - bufferedItems,
-      0
-    );
-    const endIndex = Math.min(
-      Math.ceil((scrollPosition + containerHeight) / rowHeight - 1) +
-        bufferedItems,
-      children.length - 1
-    );
+  const visibleItems: JSX.Element[] = [];
 
-    return children.slice(startIndex, endIndex + 1).map((child, index) => {
-      const top = (startIndex + index) * rowHeight + index * gap;
-      const height = rowHeight;
-      const lineHeight = `${rowHeight}px`;
+  const memoizedRenderItem: MemoizedRenderItem = useMemo(() => {
+    return (index: number) => (
+      <li
+        key={index}
+        style={{
+          position: 'absolute',
+          top: `${index * itemHeight}px`,
+          width: '100%',
+        }}
+      >
+        {renderItem(index)}
+      </li>
+    );
+  }, [renderItem]);
 
-      return (
-        <ListItem
-          key={`name-${startIndex + index}`}
-          top={top}
-          height={height}
-          lineHeight={lineHeight}
-        >
-          {renderRow(child)}
-        </ListItem>
-      );
-    });
-  }, [children, containerHeight, rowHeight, scrollPosition, gap]);
+  for (let i = startIndex; i <= endIndex; i++) {
+    visibleItems.push(memoizedRenderItem(i));
+  }
+
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) =>
+    setScrollPosition(e.currentTarget.scrollTop);
 
   return (
-    <ul onScroll={onScroll} ref={containerRef} className='list'>
-      {visibleRows}
-    </ul>
+    <div>
+      <header>{header()}</header>
+      <div
+        className='scroll'
+        style={{ overflowY: 'scroll', height: `${height}px` }}
+        onScroll={onScroll}
+      >
+        <ul
+          className='list'
+          style={{ position: 'relative', height: `${innerHeight}px` }}
+        >
+          {visibleItems}
+        </ul>
+      </div>
+    </div>
   );
-};
+}
 
-export default React.memo(VirtualizedList);
+export default VirtualizedList;
